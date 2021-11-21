@@ -1,6 +1,12 @@
 # AwdPwnPatcher
 
-AwdPwnPatcher是一款针对CTF AWD比赛中PWN题的半自动化patch工具，为什么要写这样一款工具，因为感觉目前用IDA或者lief工具在进行patch的时候，会有以下问题：
+AwdPwnPatcher是一款针对CTF AWD比赛中PWN题的半自动化patch工具，有以下几个优点：
+
+- 可以很方便地对补丁做好版本管理
+- 适合多人协作patch
+- 支持x86、mips、arm三种架构，支持32位、64位以及大小端模式
+
+为什么要写这样一款工具，因为感觉目前用IDA或者lief工具在进行patch的时候，会有以下问题：
 
 - IDA修改原文件，需要通过Edit -> Patch program -> Apply patches to input file才能使修改生效，可能会因为忘记使用该操作而导致修改未生效
 - IDA修改原文件时，可以选择将原文件备份成.bak，然后在原文件上进行修改，此时可能产生的影响是，如果多次使用Apply patches to input file，你只会保留前一个修改后的副本，这时你想回退到之前的副本时，几乎不可能。

@@ -6,6 +6,9 @@ import keystone
 import ctypes
 import shutil
 import struct
+import sys
+
+PYTHON_VERSION = sys.version_info[0]
 
 class AwdPwnPatcher:
     def __init__(self, path):
@@ -108,6 +111,8 @@ class AwdPwnPatcher:
 
         self.offset += len(shellcode)
         assert(self.offset <= self.eh_frame_size)
+        if PYTHON_VERSION == 3:
+            shellcode = shellcode.encode("latin-1")
         self.binary.write(patch_start_addr, shellcode)
         return patch_start_addr
 
@@ -122,6 +127,8 @@ class AwdPwnPatcher:
         if end != 0:
             assert(len(shellcode) <= (end-start))
             shellcode = shellcode.ljust(end - start, "\x90")
+        if PYTHON_VERSION == 3:
+            shellcode = shellcode.encode("latin-1")
         self.binary.write(start, shellcode)
 
     def patch_by_jmp(self, jmp_from, jmp_to=0, assembly="", machine_code=[]):
@@ -173,6 +180,8 @@ class AwdPwnPatcher:
 
     def add_constant_in_ehframe(self, string):
         patch_start_addr = self.eh_frame_addr + self.offset
+        if PYTHON_VERSION == 3:
+            string = string.encode("latin-1")
         self.binary.write(patch_start_addr, string)
         self.offset += len(string)
         return patch_start_addr
@@ -231,12 +240,15 @@ class AwdPwnPatcher:
         p_flags_offset = 24 if self.bits == 32 else 4
         for i in range(0, e_phnum):
             phdr = self.binary.get_segment(i).header
-            page_start = (phdr.p_vaddr / 0x1000) * 0x1000
+            page_start = int((phdr.p_vaddr / 0x1000) * 0x1000)
             page_end = phdr.p_vaddr + phdr.p_memsz
             if page_end % 0x1000 != 0:
                 page_end = (page_end / 0x1000) * 0x1000 + 0x1000
             if phdr.p_type == "PT_LOAD" and page_start <= self.eh_frame_addr and page_end >= self.eh_frame_addr + self.eh_frame_size:
                 print("fix_eh_frame_flags:\npage_start: {} page_end: {} eh_frame_addr: {} eh_frame_size: {} origin phdr.p_flags: {}"
                       .format(hex(page_start), hex(page_end), hex(self.eh_frame_addr), hex(self.eh_frame_size), str(phdr.p_flags)))
-                self.binary.write(e_phoff + phdr_size * i + p_flags_offset, chr(phdr.p_flags | 1))
+                flags = chr(phdr.p_flags | 1)
+                if PYTHON_VERSION == 3:
+                    flags = flags.encode("latin-1")
+                self.binary.write(e_phoff + phdr_size * i + p_flags_offset, flags)
 

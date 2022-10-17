@@ -19,7 +19,7 @@ AwdPwnPatcher是一款针对CTF AWD比赛中PWN题的半自动化patch工具，�
 
 ## 依赖安装
 
-python2环境：
+支持python2/python3环境：
 
 ```
 sudo pip install pwntools
@@ -105,7 +105,8 @@ awd_pwn_patcher = AwdPwnPatcher(binary)
 
 ### 2022-10-17
 
-修复patch_by_jump函数逻辑问题：当同时提供jmp_to和machine_code两个参数时，machine_code不会写入。
+- 修复patch_by_jump函数逻辑问题：当同时提供jmp_to和machine_code两个参数时，machine_code不会写入。
+- 增加对python3的支持
 
 ### 2021-11-19
 
@@ -127,4 +128,4 @@ save函数自动将ehframe段修改为可执行
 ### TODO
 
 - [x] 在save函数里添加自动将ehframe段改为可写可执行的代码
-- [ ] 增加对python3的支持
+- [x] 增加对python3的支持

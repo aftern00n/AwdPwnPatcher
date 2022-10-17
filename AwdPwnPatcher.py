@@ -136,12 +136,21 @@ class AwdPwnPatcher:
                 jmp_ins = "j"
         if jmp_to:
             payload = "{} {}".format(jmp_ins, hex(jmp_to))
-            assembly += payload
+            if len(assembly) != 0:
+                assembly += "\n" + payload
+            else:
+                addr = self.get_next_patch_start_addr() + len(machine_code)
+                shellcode, count = self.ks.asm(payload, addr=addr)
+                machine_code += shellcode
         patch_start_addr = self.add_patch_in_ehframe(assembly=assembly, machine_code=machine_code)
         if jmp_to:
+            # fix translation bug of mips jump code: when keystone translates jmp code, it treats the value of argument start as the base address,
+            # rather than the address of jump code.
+            # FYI: shellcode, count = self.ks.asm(assembly, addr=patch_start_addr)
             if self.arch == "mips" or self.arch == "mips64":
                 next_patch_addr = self.get_next_patch_start_addr()
                 payload = "{} {}".format(jmp_ins, hex(jmp_to))
+                # why - 8? because a nop code will be added automatically after jmp code.
                 self.patch_origin(next_patch_addr-8, assembly=payload)
 
         if patch_start_addr == 0:

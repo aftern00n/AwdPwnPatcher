@@ -17,7 +17,7 @@ AwdPwnPatcher是一款针对CTF AWD比赛中PWN题的半自动化patch工具，�
 
 该工具目前适用x86、arm和mips架构，包括32位和64位，该脚本patch的思路主要是通过jmp跳转到eh_frame段执行patch代码，然后再跳回程序原逻辑。当然也支持patch call指令（只针对x86，arm和mips暂未添加），改为调用在eh_frame段添加的函数，但这种方式很有可能在比赛中过不了check，比方UAF漏洞，不允许patch call free。
 
-## 依赖库安装
+## 依赖安装
 
 python2环境：
 
@@ -97,11 +97,15 @@ awd_pwn_patcher = AwdPwnPatcher(binary)
 
 - 作用：当执行完所有的patch后，通过save函数将结果保存到二进制文件中，该文件以.patch为后缀名。在保存的时候，会自动修改eh_frame段为可执行。
 
-## 样例
+## 教程样例
 
 程序和代码见example文件夹，教程见[Tutorial](./Tutorial.md)
 
 ## 更新日志
+
+### 2022-10-17
+
+修复patch_by_jump函数逻辑问题：当同时提供jmp_to和machine_code两个参数时，machine_code不会写入。
 
 ### 2021-11-19
 

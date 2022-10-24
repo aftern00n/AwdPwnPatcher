@@ -47,16 +47,16 @@ binary = "./test"
 awd_pwn_patcher = AwdPwnPatcher(binary)
 ```
 
-## 关键函数
+然后通过调用类成员函数，对目标程序进行patch，一些关键函数如下：
 
-### add_patch_in_ehframe(self, assembly="", machine_code=[])
+**add_patch_in_ehframe(self, assembly="", machine_code=[])**
 
 - 作用：在eh_frame段中添加patch代码
 - 参数
   - assembly：要添加的汇编代码，与machine_code二选一
   - machine_code：要添加的机器码，类型为整数列表，与assembly二选一
 
-### patch_origin(self, start, end=0, assembly="", machine_code=[])
+**patch_origin(self, start, end=0, assembly="", machine_code=[])**
 
 - 作用：主要针对在原指令处修改的patch
 - 参数：
@@ -65,7 +65,7 @@ awd_pwn_patcher = AwdPwnPatcher(binary)
   - assembly：要添加的汇编代码，与machine_code二选一
   - machine_code：要添加的机器码，类型为整数列表，与assembly二选一
 
-### patch_by_jmp(self, jmp_from, jmp_to=0, assembly="", machine_code=[])
+**patch_by_jmp(self, jmp_from, jmp_to=0, assembly="", machine_code=[])**
 
 - 作用：通过jmp指令修改原程序逻辑，使得跳转到eh_frame段处的patch代码，执行完patch代码后再跳转回去
 - 参数
@@ -74,7 +74,7 @@ awd_pwn_patcher = AwdPwnPatcher(binary)
   - assembly：要添加的汇编代码，与machine_code二选一
   - machine_code：要添加的机器码，类型为整数列表，与assembly二选一
 
-### patch_by_call(self, call_from, assembly="", machine_code=[])
+**patch_by_call(self, call_from, assembly="", machine_code=[])**
 
 - 作用：通过修改call指令，使其调用在eh_frame段添加的函数，目前只适用x86架构
 - 参数
@@ -82,24 +82,24 @@ awd_pwn_patcher = AwdPwnPatcher(binary)
   - assembly：要在eh_frame段插入的汇编代码，记得包含ret，与machine_code二选一
   - machine_code：要添加的机器码，类型为整数列表，与assembly二选一
 
-### add_constant_in_ehframe(self, string)
+**add_constant_in_ehframe(self, string)**
 
 - 作用：在eh_frame段中添加常量，如整数、字符串等。
 - 参数：
   - string：常量，类型为str，比如添加整数0xffff，则值为'\xff\xff\x00\x00'
 - 返回值：常量的起始地址
 
-### get_next_patch_start_addr(self):
+**get_next_patch_start_addr(self)**
 
 - 作用：获取下一段patch代码的起始地址
 
-### save(self)：
+**save(self)**
 
 - 作用：当执行完所有的patch后，通过save函数将结果保存到二进制文件中，该文件以.patch为后缀名。在保存的时候，会自动修改eh_frame段为可执行。
 
 ## 教程样例
 
-程序和代码见example文件夹，教程见[Tutorial](./Tutorial.md)
+程序和代码见example文件夹，详细教程见[Tutorial](./Tutorial.md)。
 
 ## 更新日志
 

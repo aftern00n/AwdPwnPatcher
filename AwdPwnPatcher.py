@@ -244,6 +244,7 @@ class AwdPwnPatcher:
             page_end = phdr.p_vaddr + phdr.p_memsz
             if page_end % 0x1000 != 0:
                 page_end = (page_end / 0x1000) * 0x1000 + 0x1000
+                page_end = int(page_end)
             if phdr.p_type == "PT_LOAD" and page_start <= self.eh_frame_addr and page_end >= self.eh_frame_addr + self.eh_frame_size:
                 print("fix_eh_frame_flags:\npage_start: {} page_end: {} eh_frame_addr: {} eh_frame_size: {} origin phdr.p_flags: {}"
                       .format(hex(page_start), hex(page_end), hex(self.eh_frame_addr), hex(self.eh_frame_size), str(phdr.p_flags)))

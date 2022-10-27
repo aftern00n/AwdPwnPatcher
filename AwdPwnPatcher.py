@@ -34,11 +34,15 @@ class AwdPwnPatcher:
         elif self.arch == "mips" or self.arch == "mips64":
             self.ks_arch = keystone.KS_ARCH_MIPS
             self.ks_mode = keystone.KS_MODE_MIPS32 if self.bits == 32 else keystone.KS_MODE_MIPS64
+        else:
+            self.ks_mode = 0
+            self.ks_arch = 0
         if self.endian == "little":
             self.ks_mode |= keystone.KS_MODE_LITTLE_ENDIAN
         else:
             self.ks_mode |= keystone.KS_MODE_BIG_ENDIAN
-        self.ks = keystone.Ks(self.ks_arch, self.ks_mode)
+        if self.ks_arch != 0:
+            self.ks = keystone.Ks(self.ks_arch, self.ks_mode)
         self.eh_frame_section = self.binary.get_section_by_name(".eh_frame")
         self.eh_frame_addr = self.eh_frame_section.header.sh_addr
         self.eh_frame_size = self.eh_frame_section.header.sh_size

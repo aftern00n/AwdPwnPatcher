@@ -56,14 +56,15 @@ awd_pwn_patcher = AwdPwnPatcher(binary)
   - assembly：要添加的汇编代码，与machine_code二选一
   - machine_code：要添加的机器码，类型为整数列表，与assembly二选一
 
-**patch_origin(self, start, end=0, assembly="", machine_code=[])**
+**patch_origin(self, start, end=0, assembly="", machine_code=[], string="")**
 
-- 作用：主要针对在原指令处修改的patch
+- 作用：主要针对在原地址处修改指令或字符串的patch
 - 参数：
   - start：原程序待patch的起始指令地址
   - end：原程序待patch的结束指令地址，如果不为0，则会要求assembly翻译成机器码的长度或者machine_code的长度必须小于等于end-start，小于的时候会用nop指令填充
   - assembly：要添加的汇编代码，与machine_code二选一
   - machine_code：要添加的机器码，类型为整数列表，与assembly二选一
+  - string：要修改成的字符串，也可以用来修改整数，整数需要转成字符串，该参数与汇编的两个参数二选一
 
 **patch_by_jmp(self, jmp_from, jmp_to=0, assembly="", machine_code=[])**
 
@@ -93,9 +94,9 @@ awd_pwn_patcher = AwdPwnPatcher(binary)
 
 - 作用：获取下一段patch代码的起始地址
 
-**save(self)**
+**save(self, save_path="")**
 
-- 作用：当执行完所有的patch后，通过save函数将结果保存到二进制文件中，该文件以.patch为后缀名。在保存的时候，会自动修改eh_frame段为可执行。
+- 作用：当执行完所有的patch后，通过save函数将结果保存到二进制文件中，在不提供save_patch参数的时候，默认文件以_patch为后缀名。在保存的时候，会自动修改eh_frame段为可执行。
 
 ## 教程样例
 
@@ -124,8 +125,3 @@ save函数自动将ehframe段修改为可执行
 
 - 更新README的使用说明
 - 添加样例教程
-
-### TODO
-
-- [x] 在save函数里添加自动将ehframe段改为可写可执行的代码
-- [x] 增加对python3的支持

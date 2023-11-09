@@ -120,12 +120,14 @@ class AwdPwnPatcher:
         self.binary.write(patch_start_addr, shellcode)
         return patch_start_addr
 
-    def patch_origin(self, start, end=0, assembly="", machine_code=[]):
+    def patch_origin(self, start, end=0, assembly="", machine_code=[], string=""):
         if len(assembly) != 0:
             shellcode, count = self.ks.asm(assembly, addr=start)
             shellcode = "".join([chr(x) for x in shellcode])
         elif len(machine_code) != 0:
             shellcode = "".join([chr(x) for x in machine_code])
+        elif len(string) != 0:
+            shellcode = string
         else:
             shellcode = ""
         if end != 0:
@@ -230,9 +232,12 @@ class AwdPwnPatcher:
             """.format(hex(fmt_addr), hex(printf_addr))
         self.patch_by_call(call_from, assembly=assembly)
             
-    def save(self):
+    def save(self, save_path=""):
         self.fix_eh_frame_flags()
-        self.binary.save(self.save_path)
+        if len(save_path) != 0:
+            self.binary.save(save_path)
+        else:
+            self.binary.save(self.save_path)
 
     def get_next_patch_start_addr(self):
         return self.eh_frame_addr + self.offset

@@ -11,7 +11,7 @@ import sys
 PYTHON_VERSION = sys.version_info[0]
 
 class AwdPwnPatcher:
-    def __init__(self, path):
+    def __init__(self, path, adjust_eh_frame_size=True):
         self.path = path
         self.save_path = path + "_patch"
         self.binary = ELF(self.path)
@@ -47,7 +47,8 @@ class AwdPwnPatcher:
         self.eh_frame_addr = self.eh_frame_section.header.sh_addr
         self.eh_frame_size = self.eh_frame_section.header.sh_size
         self.offset = 0
-        self.adjust_eh_frame_size()
+        if adjust_eh_frame_size:
+            self.adjust_eh_frame_size()
 
     def adjust_eh_frame_size(self):
         if self.arch == "arm" or self.arch == "aarch64" or self.arch == "mips" or self.arch == "mips64":
@@ -99,6 +100,21 @@ class AwdPwnPatcher:
 
             print("old eh_frame_size: %#x" % self.old_eh_frame_size)
         print("eh_frame_size: %#x" % self.eh_frame_size)
+
+    def patch_file(self, offset, content, save_path=""):
+        if len(save_path) != 0:
+            shutil.copy2(self.path, save_path)
+        else:
+            shutil.copy2(self.path, self.save_path)
+        self.bin_file = open(self.save_path, "rb+")
+        self.bin_file.seek(offset)
+        self.bin_file.write(content)
+        self.bin_file.close()
+
+    def generate_shellcode(self, assembly, base_addr):
+        shellcode, count = self.ks.asm(assembly, addr=base_addr)
+        shellcode = "".join([chr(x) for x in shellcode])
+        return shellcode
 
     def add_patch_in_ehframe(self, assembly="", machine_code=[]):
         patch_start_addr = self.eh_frame_addr + self.offset
@@ -231,9 +247,11 @@ class AwdPwnPatcher:
             ret
             """.format(hex(fmt_addr), hex(printf_addr))
         self.patch_by_call(call_from, assembly=assembly)
+
             
-    def save(self, save_path=""):
-        self.fix_eh_frame_flags()
+    def save(self, save_path="", fix_eh_frame_flags=True):
+        if fix_eh_frame_flags:
+            self.fix_eh_frame_flags()
         if len(save_path) != 0:
             self.binary.save(save_path)
         else:

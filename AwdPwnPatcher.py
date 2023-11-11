@@ -104,9 +104,10 @@ class AwdPwnPatcher:
     def patch_file(self, offset, content, save_path=""):
         if len(save_path) != 0:
             shutil.copy2(self.path, save_path)
+            self.bin_file = open(save_path, "rb+")
         else:
             shutil.copy2(self.path, self.save_path)
-        self.bin_file = open(self.save_path, "rb+")
+            self.bin_file = open(self.save_path, "rb+")
         self.bin_file.seek(offset)
         self.bin_file.write(content)
         self.bin_file.close()
